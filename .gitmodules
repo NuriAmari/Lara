@@ -1,0 +1,3 @@
+[submodule "lib/langtools"]
+	path = lib/langtools
+	url = https://github.com/NuriAmari/Language-Tools.git
