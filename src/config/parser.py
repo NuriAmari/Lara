@@ -12,6 +12,7 @@ right_paren = Terminal(name="RIGHT_PAREN")
 semi_colon = Terminal(name="SEMI_COLON")
 func_kw = Terminal(name="FUNC")
 if_kw = Terminal(name="IF")
+elif_kw = Terminal(name="ELIF")
 else_kw = Terminal(name="ELSE")
 while_kw = Terminal(name="WHILE")
 for_kw = Terminal(name="FOR")
@@ -38,32 +39,37 @@ FUNCTION_CALL = NonTerminal(name="FUNCTION_DEF",)
 IF_BLOCK = NonTerminal(name="IF_BLOCK")
 IF_BLOCK_CONTINUE = NonTerminal(name="IF_BLOCK_CONTINUE")
 IF = NonTerminal(name="IF")
-ELSE_IF = NonTerminal(name="ELSE_IF")
-ELSE_IF_CONTINUE = NonTerminal(name="ELSE_IF_CONTINUE")
+ELIF = NonTerminal(name="ELIF")
+ELIF_CONTINUE = NonTerminal(name="ELIF_CONTINUE")
 ELSE = NonTerminal(name="ELSE")
-CONDITION = NonTerminal(name="CONDITION")
+EXPRESSION = NonTerminal(name="EXPRESSION")
 FOR_BLOCK = NonTerminal(name="FOR_BLOCK")
 WHILE_BLOCK = NonTerminal(name="WHILE_BLOCK")
 VAR_DEF = NonTerminal(name="VAR_DEF")
 VAR_REF = NonTerminal(name="VAR_DEF")
 EXPRESSION = NonTerminal(name="EXPRESSION")
 ARGUMENTS = NonTerminal(name="ARGUMENTS")
+ARGUMENT = NonTerminal(name="ARGUMENT")
+ANOTHER_ARGUMENT = NonTerminal(name="ANOTHER_ARGUMENT")
 OPERATOR = NonTerminal(name="OPERATOR")
 CALL = NonTerminal(name="CALL")
 TERM = NonTerminal(name="TERM")
 FACTOR = NonTerminal(name="FACTOR")
+TERM_OPERATOR = NonTerminal(name="TERM_OPERATOR")
+FACTOR_OPERATOR = NonTerminal(name="FACTOR_OPERATOR")
 
 PRODUCTION_RULES = [
     ProductionRule(START, [STATEMENTS]),
     ProductionRule(STATEMENTS, [STATEMENT, ANOTHER_STATEMENT]),
-    ProductionRule(ANOTHER_STATEMENT, [STATEMENTS, Epsilon()]),
-    ProductionRule(STATEMENT, [VAR_DEF]),
-    ProductionRule(STATEMENT, [FUNCTION_DEF]),
+    ProductionRule(ANOTHER_STATEMENT, [STATEMENTS]),
+    ProductionRule(ANOTHER_STATEMENT, [Epsilon()]),
+    ProductionRule(STATEMENT, [VAR_DEF, semi_colon]),
     ProductionRule(STATEMENT, [IF_BLOCK]),
-    ProductionRule(IF_BLOCK, [IF_BLOCK, IF_BLOCK_CONTINUE]),
+    ProductionRule(IF_BLOCK, [IF, IF_BLOCK_CONTINUE]),
     ProductionRule(IF_BLOCK_CONTINUE, [Epsilon()]),
     ProductionRule(IF_BLOCK_CONTINUE, [ELSE]),
-    ProductionRule(IF_BLOCK_CONTINUE, [ELSE_IF, IF_BLOCK_CONTINUE]),
+    ProductionRule(IF_BLOCK_CONTINUE, [ELIF, IF_BLOCK_CONTINUE]),
+    # loops
     ProductionRule(STATEMENT, [FOR_BLOCK]),
     ProductionRule(
         FOR_BLOCK,
@@ -72,7 +78,7 @@ PRODUCTION_RULES = [
             left_paren,
             VAR_DEF,
             semi_colon,
-            CONDITION,
+            EXPRESSION,
             semi_colon,
             STATEMENT,
             right_paren,
@@ -87,18 +93,20 @@ PRODUCTION_RULES = [
         [
             while_kw,
             left_paren,
-            CONDITION,
+            EXPRESSION,
             right_paren,
             left_curly,
             STATEMENTS,
             right_curly,
         ],
     ),
+    # function definitions
     ProductionRule(STATEMENT, [FUNCTION_DEF]),
     ProductionRule(
         FUNCTION_DEF,
         [
             func_kw,
+            identifier,
             left_paren,
             ARGUMENTS,
             right_paren,
@@ -107,22 +115,55 @@ PRODUCTION_RULES = [
             right_curly,
         ],
     ),
-    ProductionRule(STATEMENT, [EXPRESSION]),
-    ProductionRule(EXPRESSION, [TERM, plus, EXPRESSION]),
-    ProductionRule(EXPRESSION, [TERM, minus, EXPRESSION]),
-    ProductionRule(EXPRESSION, [TERM]),
-    ProductionRule(TERM, [FACTOR, multiply, TERM]),
-    ProductionRule(TERM, [FACTOR, divide, TERM]),
-    ProductionRule(TERM, [FACTOR]),
+    # expressions
+    ProductionRule(STATEMENT, [EXPRESSION, semi_colon]),
+    ProductionRule(EXPRESSION, [TERM, TERM_OPERATOR]),
+    ProductionRule(TERM_OPERATOR, [plus, EXPRESSION]),
+    ProductionRule(TERM_OPERATOR, [minus, EXPRESSION]),
+    ProductionRule(TERM_OPERATOR, [Epsilon()]),
+    ProductionRule(TERM, [FACTOR, FACTOR_OPERATOR]),
+    ProductionRule(FACTOR_OPERATOR, [multiply, TERM]),
+    ProductionRule(FACTOR_OPERATOR, [divide, TERM]),
+    ProductionRule(FACTOR_OPERATOR, [Epsilon()]),
     ProductionRule(FACTOR, [left_paren, EXPRESSION, right_paren]),
     ProductionRule(FACTOR, [integer]),
     ProductionRule(FACTOR, [VAR_REF]),
     ProductionRule(VAR_REF, [identifier, CALL]),
     ProductionRule(CALL, [left_paren, ARGUMENTS, right_paren]),
     ProductionRule(CALL, [Epsilon()]),
-    ProductionRule(STATEMENT, [VAR_DEF]),
     ProductionRule(VAR_DEF, [let, identifier, assign, integer]),
-    ProductionRule(ARGUMENTS, [ARGUMENT, ANOTHER_ARGUMENT]),
+    # function arguments
+    ProductionRule(ARGUMENTS, [identifier, ANOTHER_ARGUMENT]),
     ProductionRule(ANOTHER_ARGUMENT, [comma, ARGUMENTS]),
     ProductionRule(ANOTHER_ARGUMENT, [Epsilon()]),
+    # conditionals
+    ProductionRule(
+        IF,
+        [
+            if_kw,
+            left_paren,
+            EXPRESSION,
+            right_paren,
+            left_curly,
+            STATEMENTS,
+            right_curly,
+        ],
+    ),
+    ProductionRule(
+        ELIF,
+        [
+            elif_kw,
+            left_paren,
+            EXPRESSION,
+            right_paren,
+            left_curly,
+            STATEMENTS,
+            right_curly,
+        ],
+    ),
+    ProductionRule(ELSE, [else_kw, left_curly, STATEMENTS, right_curly]),
+    # IO
+    ProductionRule(
+        STATEMENT, [print_kw, left_paren, EXPRESSION, right_paren, semi_colon]
+    ),
 ]

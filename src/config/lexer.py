@@ -13,6 +13,7 @@ from src.config.tokens import (
     CompareToken,
     DivideToken,
     ElseToken,
+    ElifToken,
     ForToken,
     FuncToken,
     GreaterEqualToken,
@@ -62,7 +63,7 @@ ASSIGN = Atom("=")
 COMPARE = Concat(Atom("="), Atom("="))
 LESS = Atom("<")
 LESS_EQUAL = Concat(Atom("<"), Atom("="))
-GREATER = Concat(Atom(">"))
+GREATER = Atom(">")
 GREATER_EQUAL = Concat(Atom(">"), Atom("="))
 
 ASSIGN.add_token(AssignToken)
@@ -86,12 +87,14 @@ IDENTIFIER.add_token(IdentifierToken)
 IF = Concat(Atom("i"), Atom("f"))
 WHILE = Concat(Atom("w"), Atom("h"), Atom("i"), Atom("l"), Atom("e"))
 ELSE = Concat(Atom("e"), Atom("l"), Atom("s"), Atom("e"))
+ELIF = Concat(Atom("e"), Atom("l"), Atom("i"), Atom("f"))
 FUNC = Concat(Atom("f"), Atom("u"), Atom("n"), Atom("c"))
 FOR = Concat(Atom("f"), Atom("o"), Atom("r"))
 
 IF.add_token(IfToken)
 WHILE.add_token(WhileToken)
 ELSE.add_token(ElseToken)
+ELIF.add_token(ElifToken)
 FUNC.add_token(FuncToken)
 FOR.add_token(ForToken)
 
@@ -132,6 +135,7 @@ TOKENIZER = DFA(
         IF,
         WHILE,
         ELSE,
+        ELIF,
         FUNC,
         FOR,
         SEMI_COLON,

@@ -2,10 +2,27 @@
 import sys
 
 from langtools.lexer.lexer import tokenize
+from langtools.parser.cfg import CFG
 
 from src.config.lexer import TOKENIZER
+from src.config.parser import PRODUCTION_RULES, START
+from src.eval import evaluate
 
 num_args = len(sys.argv)
 
 if num_args > 1:
-    print(tokenize(open(sys.argv[1]), TOKENIZER, white_space_delimit=True))
+    tokens = tokenize(open(sys.argv[1]), TOKENIZER, white_space_delimit=True)
+    lara_grammar = CFG(
+        production_rules=PRODUCTION_RULES,
+        alphabet=[chr(i) for i in range(128)],
+        start_symbol=START,
+    )
+    ast = lara_grammar.LL1_parse(tokens)
+    ast.flatten(
+        {
+            "STATEMENTS": "ANOTHER_STATEMENT",
+            "ARGUMENTS": "ANOTHER_ARGUMENT",
+            "IF_BLOCK": "IF_BLOCK_CONTINUE",
+        }
+    )
+    evaluate(ast)
