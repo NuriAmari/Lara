@@ -49,7 +49,9 @@ VAR_REF = NonTerminal(name="VAR_DEF")
 EXPRESSION = NonTerminal(name="EXPRESSION")
 ARGUMENTS = NonTerminal(name="ARGUMENTS")
 OPERATOR = NonTerminal(name="OPERATOR")
-CALL = NonTerminal(name="OPERATOR")
+CALL = NonTerminal(name="CALL")
+TERM = NonTerminal(name="TERM")
+FACTOR = NonTerminal(name="FACTOR")
 
 PRODUCTION_RULES = [
     ProductionRule(START, [STATEMENTS]),
@@ -106,16 +108,21 @@ PRODUCTION_RULES = [
         ],
     ),
     ProductionRule(STATEMENT, [EXPRESSION]),
-    ProductionRule(EXPRESSION, [VAR_REF]),
-    ProductionRule(VAR_REF, [identifier, OPERATOR]),
-    ProductionRule(OPERATOR, [plus]),
-    ProductionRule(OPERATOR, [minus]),
-    ProductionRule(OPERATOR, [multiply]),
-    ProductionRule(OPERATOR, [power]),
-    ProductionRule(OPERATOR, [divide]),
-    ProductionRule(OPERATOR, [CALL]),
-    ProductionRule(OPERATOR, [Epsilon()]),
+    ProductionRule(EXPRESSION, [TERM, plus, EXPRESSION]),
+    ProductionRule(EXPRESSION, [TERM, minus, EXPRESSION]),
+    ProductionRule(EXPRESSION, [TERM]),
+    ProductionRule(TERM, [FACTOR, multiply, TERM]),
+    ProductionRule(TERM, [FACTOR, divide, TERM]),
+    ProductionRule(TERM, [FACTOR]),
+    ProductionRule(FACTOR, [left_paren, EXPRESSION, right_paren]),
+    ProductionRule(FACTOR, [integer]),
+    ProductionRule(FACTOR, [VAR_REF]),
+    ProductionRule(VAR_REF, [identifier, CALL]),
     ProductionRule(CALL, [left_paren, ARGUMENTS, right_paren]),
+    ProductionRule(CALL, [Epsilon()]),
     ProductionRule(STATEMENT, [VAR_DEF]),
     ProductionRule(VAR_DEF, [let, identifier, assign, integer]),
+    ProductionRule(ARGUMENTS, [ARGUMENT, ANOTHER_ARGUMENT]),
+    ProductionRule(ANOTHER_ARGUMENT, [comma, ARGUMENTS]),
+    ProductionRule(ANOTHER_ARGUMENT, [Epsilon()]),
 ]
