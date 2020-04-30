@@ -1,0 +1,11 @@
+#!/bin/python
+import sys
+
+from langtools.lexer.lexer import tokenize
+
+from src.config.lexer import TOKENIZER
+
+num_args = len(sys.argv)
+
+if num_args > 1:
+    print(tokenize(open(sys.argv[1]), TOKENIZER, white_space_delimit=True))

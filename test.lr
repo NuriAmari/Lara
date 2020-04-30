@@ -1,0 +1,7 @@
+func main(a, b, c) {
+    if (a + b) {
+        print(1);
+    } else if (c - a) {
+        print(2);
+    }
+}
