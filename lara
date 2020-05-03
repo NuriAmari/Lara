@@ -6,7 +6,7 @@ from langtools.parser.cfg import CFG
 
 from src.config.lexer import TOKENIZER
 from src.config.parser import PRODUCTION_RULES, START
-from src.eval import evaluate
+from src.eval import Evaluator
 
 num_args = len(sys.argv)
 
@@ -20,9 +20,13 @@ if num_args > 1:
     ast = lara_grammar.LL1_parse(tokens)
     ast.flatten(
         {
-            "STATEMENTS": "ANOTHER_STATEMENT",
-            "ARGUMENTS": "ANOTHER_ARGUMENT",
-            "IF_BLOCK": "IF_BLOCK_CONTINUE",
+            "STATEMENTS": {"STATEMENTS"},
+            "ARGUMENTS": {"ANOTHER_ARGUMENT", "ARGUMENTS"},
+            "ANOTHER_ARGUMENT": {"ARGUMENTS"},
+            "ARGUMENTS_DEF": {"ANOTHER_ARGUMENT_DEF", "ARGUMENTS_DEF"},
+            "ANOTHER_ARGUMENT_DEF": {"ARGUMENTS_DEF"},
+            # "EXPRESSION": {"TERM_OPERATOR"},
         }
     )
-    evaluate(ast)
+    evaluator = Evaluator(ast)
+    evaluator.evaluate()

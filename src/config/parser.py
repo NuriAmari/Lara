@@ -25,6 +25,7 @@ power = Terminal(name="POWER")
 identifier = Terminal(name="IDENTIFIER")
 let = Terminal(name="LET")
 assign = Terminal(name="ASSIGN")
+return_kw = Terminal(name="RETURN")
 
 
 # NON TERMINAL
@@ -32,10 +33,10 @@ assign = Terminal(name="ASSIGN")
 START = NonTerminal(name="START")
 STATEMENTS = NonTerminal(name="STATEMENTS",)
 STATEMENT = NonTerminal(name="STATEMENT",)
-ANOTHER_STATEMENT = NonTerminal(name="STATEMENTS",)
+ANOTHER_STATEMENT = NonTerminal(name="ANOTHER_STATEMENT",)
 IDENTIFIER_REF = NonTerminal(name="FUNCTION_REF",)
 FUNCTION_DEF = NonTerminal(name="FUNCTION_DEF",)
-FUNCTION_CALL = NonTerminal(name="FUNCTION_DEF",)
+FUNCTION_CALL = NonTerminal(name="FUNCTION_CALL",)
 IF_BLOCK = NonTerminal(name="IF_BLOCK")
 IF_BLOCK_CONTINUE = NonTerminal(name="IF_BLOCK_CONTINUE")
 IF = NonTerminal(name="IF")
@@ -46,7 +47,7 @@ EXPRESSION = NonTerminal(name="EXPRESSION")
 FOR_BLOCK = NonTerminal(name="FOR_BLOCK")
 WHILE_BLOCK = NonTerminal(name="WHILE_BLOCK")
 VAR_DEF = NonTerminal(name="VAR_DEF")
-VAR_REF = NonTerminal(name="VAR_DEF")
+VAR_REF = NonTerminal(name="VAR_REF")
 EXPRESSION = NonTerminal(name="EXPRESSION")
 ARGUMENTS = NonTerminal(name="ARGUMENTS")
 ARGUMENT = NonTerminal(name="ARGUMENT")
@@ -57,12 +58,18 @@ TERM = NonTerminal(name="TERM")
 FACTOR = NonTerminal(name="FACTOR")
 TERM_OPERATOR = NonTerminal(name="TERM_OPERATOR")
 FACTOR_OPERATOR = NonTerminal(name="FACTOR_OPERATOR")
+OUTPUT = NonTerminal(name="OUTPUT")
+ARGUMENTS_DEF = NonTerminal(name="ARGUMENTS_DEF")
+ARGUMENT_DEF = NonTerminal(name="ARGUMENT_DEF")
+ANOTHER_ARGUMENT_DEF = NonTerminal(name="ANOTHER_ARGUMENT_DEF")
+RETURN_STATEMENT = NonTerminal(name="RETURN_STATEMENT")
+RETURN_VALUE = NonTerminal(name="RETURN_VALUE")
 
 PRODUCTION_RULES = [
     ProductionRule(START, [STATEMENTS]),
-    ProductionRule(STATEMENTS, [STATEMENT, ANOTHER_STATEMENT]),
+    ProductionRule(STATEMENTS, [STATEMENT, STATEMENTS]),
+    ProductionRule(STATEMENTS, [Epsilon()]),
     ProductionRule(ANOTHER_STATEMENT, [STATEMENTS]),
-    ProductionRule(ANOTHER_STATEMENT, [Epsilon()]),
     ProductionRule(STATEMENT, [VAR_DEF, semi_colon]),
     ProductionRule(STATEMENT, [IF_BLOCK]),
     ProductionRule(IF_BLOCK, [IF, IF_BLOCK_CONTINUE]),
@@ -108,7 +115,7 @@ PRODUCTION_RULES = [
             func_kw,
             identifier,
             left_paren,
-            ARGUMENTS,
+            ARGUMENTS_DEF,
             right_paren,
             left_curly,
             STATEMENTS,
@@ -131,11 +138,19 @@ PRODUCTION_RULES = [
     ProductionRule(VAR_REF, [identifier, CALL]),
     ProductionRule(CALL, [left_paren, ARGUMENTS, right_paren]),
     ProductionRule(CALL, [Epsilon()]),
-    ProductionRule(VAR_DEF, [let, identifier, assign, integer]),
-    # function arguments
-    ProductionRule(ARGUMENTS, [identifier, ANOTHER_ARGUMENT]),
+    ProductionRule(VAR_DEF, [let, identifier, assign, EXPRESSION]),
+    # passing function arguments
+    ProductionRule(ARGUMENTS, [ARGUMENT, ANOTHER_ARGUMENT]),
+    ProductionRule(ARGUMENT, [EXPRESSION]),
+    ProductionRule(ARGUMENTS, [Epsilon()]),
     ProductionRule(ANOTHER_ARGUMENT, [comma, ARGUMENTS]),
     ProductionRule(ANOTHER_ARGUMENT, [Epsilon()]),
+    # declaring function arguments
+    ProductionRule(ARGUMENTS_DEF, [ARGUMENT_DEF, ANOTHER_ARGUMENT_DEF]),
+    ProductionRule(ARGUMENT_DEF, [identifier]),
+    ProductionRule(ARGUMENTS_DEF, [Epsilon()]),
+    ProductionRule(ANOTHER_ARGUMENT_DEF, [comma, ARGUMENTS_DEF]),
+    ProductionRule(ANOTHER_ARGUMENT_DEF, [Epsilon()]),
     # conditionals
     ProductionRule(
         IF,
@@ -163,7 +178,11 @@ PRODUCTION_RULES = [
     ),
     ProductionRule(ELSE, [else_kw, left_curly, STATEMENTS, right_curly]),
     # IO
-    ProductionRule(
-        STATEMENT, [print_kw, left_paren, EXPRESSION, right_paren, semi_colon]
-    ),
+    ProductionRule(STATEMENT, [OUTPUT]),
+    ProductionRule(OUTPUT, [print_kw, left_paren, EXPRESSION, right_paren, semi_colon]),
+    # return
+    ProductionRule(STATEMENT, [RETURN_STATEMENT, semi_colon]),
+    ProductionRule(RETURN_STATEMENT, [return_kw, RETURN_VALUE]),
+    ProductionRule(RETURN_VALUE, [EXPRESSION]),
+    ProductionRule(RETURN_VALUE, [Epsilon()]),
 ]

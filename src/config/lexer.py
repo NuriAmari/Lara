@@ -35,13 +35,14 @@ from src.config.tokens import (
     RightParenToken,
     SemiColonToken,
     WhileToken,
+    ReturnToken,
 )
 
 # LITERALS
 
 INTEGER = Concat(
     Union(Atom("-"), Epsilon()),
-    Concat(Union(*NON_ZERO_DIGITS), KleeneStar(Union(*DIGITS))),
+    Union(Atom("0"), Concat(Union(*NON_ZERO_DIGITS), KleeneStar(Union(*DIGITS)))),
 )
 INTEGER.add_token(IntegerToken)
 
@@ -55,7 +56,7 @@ DIVIDE = Atom("/")
 
 PLUS.add_token(PlusToken)
 MINUS.add_token(MinusToken)
-MULTIPLY.add_token(PowerToken)
+MULTIPLY.add_token(MultiplyToken)
 POWER.add_token(PowerToken)
 DIVIDE.add_token(DivideToken)
 
@@ -98,6 +99,9 @@ ELIF.add_token(ElifToken)
 FUNC.add_token(FuncToken)
 FOR.add_token(ForToken)
 
+RETURN = Concat(Atom("r"), Atom("e"), Atom("t"), Atom("u"), Atom("r"), Atom("n"))
+RETURN.add_token(ReturnToken)
+
 # PUNCTUATION
 
 SEMI_COLON = Atom(";")
@@ -134,10 +138,12 @@ TOKENIZER = DFA(
         IDENTIFIER,
         IF,
         WHILE,
+        ASSIGN,
         ELSE,
         ELIF,
         FUNC,
         FOR,
+        LET,
         SEMI_COLON,
         LEFT_CURLY,
         RIGHT_CURLY,
@@ -145,6 +151,7 @@ TOKENIZER = DFA(
         RIGHT_PAREN,
         COMMA,
         PRINT,
+        RETURN,
         close=False,
     )
 )

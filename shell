@@ -1,0 +1,8 @@
+#!/bin/python
+
+from langtools.parser.cfg import CFG
+
+from src.config.lexer import TOKENIZER
+from src.config.parser import *
+
+grammar = CFG(production_rules=PRODUCTION_RULES, alphabet=[chr(i) for i in range(128)], start_symbol=START)
