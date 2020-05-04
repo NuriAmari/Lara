@@ -100,3 +100,11 @@ print(1 + 1);
 - Arrays
 - More types
 - First class functions
+
+## Usage
+
+1. Clone the repo
+2. Symlink `lara` to somewhere on your PATH
+3. Make executable `chmod +x lara`
+3. Execute programs like `lara test.lr` (Note this assumes python3 is default python version on your machine)
+4. If python3 is not default, run the script explicitly `python3 lara test.lr`
