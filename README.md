@@ -87,6 +87,7 @@ func print_only_one(a,b) {
 }
 
 print_only_one();
+```
 
 ## IO
 
