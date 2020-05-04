@@ -64,6 +64,7 @@ ARGUMENT_DEF = NonTerminal(name="ARGUMENT_DEF")
 ANOTHER_ARGUMENT_DEF = NonTerminal(name="ANOTHER_ARGUMENT_DEF")
 RETURN_STATEMENT = NonTerminal(name="RETURN_STATEMENT")
 RETURN_VALUE = NonTerminal(name="RETURN_VALUE")
+VAR_ASSIGN = NonTerminal(name="VAR_ASSIGN")
 
 PRODUCTION_RULES = [
     ProductionRule(START, [STATEMENTS]),
@@ -71,6 +72,7 @@ PRODUCTION_RULES = [
     ProductionRule(STATEMENTS, [Epsilon()]),
     ProductionRule(ANOTHER_STATEMENT, [STATEMENTS]),
     ProductionRule(STATEMENT, [VAR_DEF, semi_colon]),
+    ProductionRule(STATEMENT, [VAR_ASSIGN, semi_colon]),
     ProductionRule(STATEMENT, [IF_BLOCK]),
     ProductionRule(IF_BLOCK, [IF, IF_BLOCK_CONTINUE]),
     ProductionRule(IF_BLOCK_CONTINUE, [Epsilon()]),
@@ -123,7 +125,7 @@ PRODUCTION_RULES = [
         ],
     ),
     # expressions
-    ProductionRule(STATEMENT, [EXPRESSION, semi_colon]),
+    # ProductionRule(STATEMENT, [EXPRESSION, semi_colon]),
     ProductionRule(EXPRESSION, [TERM, TERM_OPERATOR]),
     ProductionRule(TERM_OPERATOR, [plus, EXPRESSION]),
     ProductionRule(TERM_OPERATOR, [minus, EXPRESSION]),
@@ -139,6 +141,7 @@ PRODUCTION_RULES = [
     ProductionRule(CALL, [left_paren, ARGUMENTS, right_paren]),
     ProductionRule(CALL, [Epsilon()]),
     ProductionRule(VAR_DEF, [let, identifier, assign, EXPRESSION]),
+    ProductionRule(VAR_ASSIGN, [identifier, assign, EXPRESSION]),
     # passing function arguments
     ProductionRule(ARGUMENTS, [ARGUMENT, ANOTHER_ARGUMENT]),
     ProductionRule(ARGUMENT, [EXPRESSION]),

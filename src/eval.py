@@ -12,6 +12,7 @@ class ScopeTreeNode:
         self.symbols: Dict[str, Union[Function, int, None, bool]] = {
             "$RETURN": None,
             "$RETURN_FLAG": False,
+            "$BREAK_FLAG": False,
         }
         self.children: List[ScopeTreeNode] = []
 
@@ -22,6 +23,14 @@ class ScopeTreeNode:
             return self.parent.get_symbol(identifier)
         else:
             raise Exception(f"Use of undefined symbol {identifier}")
+
+    def set_symbol(self, identifier: str, value: int) -> None:
+        if identifier in self.symbols:
+            self.symbols[identifier] = value
+        elif self.parent is not None:
+            self.parent.set_symbol(identifier, value)
+        else:
+            raise Exception(f"Reference of undefined symbol {identifier}")
 
 
 class Function:
@@ -148,6 +157,10 @@ class Evaluator:
 
         return result
 
+    def _bool_cast_expression(self, ast: ASTNode) -> bool:
+        assert ast.name == "EXPRESSION"
+        return bool(self._evaluate_expression(ast))
+
     def _evaluate_return(self, ast: ASTNode) -> None:
         assert ast.name == "RETURN_STATEMENT"
 
@@ -161,10 +174,40 @@ class Evaluator:
         self.curr_scope.symbols["$RETURN"] = retval
         self.curr_scope.symbols["$RETURN_FLAG"] = True
 
+    def _evaluate_var_mutation(self, ast: ASTNode) -> None:
+        assert ast.name == "VAR_ASSIGN"
+
+        identifier_lexme = ast.children[0].lexme
+
+        if identifier_lexme is None:
+            raise Exception("Missing identifier lexme")
+
+        value = self._evaluate_expression(ast.children[2])
+        self.curr_scope.set_symbol(identifier_lexme, value)
+
     def _evaluate_io(self, ast: ASTNode) -> None:
         assert ast.name == "OUTPUT"
 
         print(self._evaluate_expression(ast.children[2]))
+
+    def _evaluate_if_block(self, ast: ASTNode) -> None:
+        assert ast.name == "IF_BLOCK"
+
+        path_taken = False
+        for child in ast.children:
+            if child.name == "IF":
+                if self._bool_cast_expression(child.children[1]):
+                    self._evaluate_statements(child.children[4])
+                    path_taken = True
+            elif child.name == "ELIF":
+                if not path_taken and self._bool_cast_expression(child.children[1]):
+                    self._evaluate_statements(child.children[4])
+                    path_taken = True
+            elif child.name == "ELSE":
+                if not path_taken:
+                    self._evaluate_statements(child.children[1])
+            else:
+                raise Exception(f"Invalid conditional branch name: {child.name}")
 
     def _evaluate_statement(self, ast: ASTNode) -> None:
         assert ast.name == "STATEMENT"
@@ -177,6 +220,10 @@ class Evaluator:
             self._evaluate_function_definition(ast.children[0])
         elif ast.children[0].name == "RETURN_STATEMENT":
             self._evaluate_return(ast.children[0])
+        elif ast.children[0].name == "VAR_ASSIGN":
+            self._evaluate_var_mutation(ast.children[0])
+        elif ast.children[0].name == "IF_BLOCK":
+            self._evaluate_if_block(ast.children[0])
         else:
             raise Exception(f"Invalid Statement: {ast.children[0].name}")
 

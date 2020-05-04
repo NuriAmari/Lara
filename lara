@@ -25,6 +25,7 @@ if num_args > 1:
             "ANOTHER_ARGUMENT": {"ARGUMENTS"},
             "ARGUMENTS_DEF": {"ANOTHER_ARGUMENT_DEF", "ARGUMENTS_DEF"},
             "ANOTHER_ARGUMENT_DEF": {"ARGUMENTS_DEF"},
+            "IF_BLOCK": {"IF_BLOCK_CONTINUE"},
             # "EXPRESSION": {"TERM_OPERATOR"},
         }
     )
