@@ -1,15 +1,13 @@
-
-func test() {
-
-    for (let i = 0; i < 10; i = i + 1) {
+func print0_9() {
+    let i = 0;
+    while (i < 10) {
         print(i);
-        if (i > 3) {
-            break;
+        i = i + 1;
+        if (i > 5) {
+            return;
         }
     }
-
-    print(1119);
-
+    print(999);
 }
 
-test();
+print0_9();

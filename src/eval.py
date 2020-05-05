@@ -276,6 +276,22 @@ class Evaluator:
 
             self._evaluate_var_mutation(var_mutation)
 
+    def _evaluate_while_block(self, ast: ASTNode) -> None:
+        assert ast.name == "WHILE_BLOCK"
+
+        condition = ast.children[2]
+        scope_when_loop_started = self.curr_scope
+
+        while self._bool_cast_expression(condition):
+            self._evaluate_statements(ast.children[5])
+
+            if self.curr_scope != scope_when_loop_started:
+                # Return statement was executed
+                return
+            if self.curr_scope.symbols["$BREAK_FLAG"]:
+                self.curr_scope.symbols["$BREAK_FLAG"] = False
+                return
+
     # A less than ideal hack to maintain an LL1 parseable grammar
     def _evaluate_root_var_ref(self, ast: ASTNode) -> None:
         assert ast.name == "ROOT_VAR_REF"
@@ -318,6 +334,8 @@ class Evaluator:
             self._evaluate_root_var_ref(ast.children[0])
         elif ast.children[0].name == "BREAK_STATEMENT":
             self._evaluate_break(ast.children[0])
+        elif ast.children[0].name == "WHILE_BLOCK":
+            self._evaluate_while_block(ast.children[0])
         else:
             raise Exception(f"Invalid Statement: {ast.children[0].name}")
 
