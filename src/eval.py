@@ -140,8 +140,8 @@ class Evaluator:
 
         return result
 
-    def _evaluate_expression(self, ast: ASTNode) -> int:
-        assert ast.name == "EXPRESSION"
+    def _evaluate_operand(self, ast: ASTNode) -> int:
+        assert ast.name == "OPERAND"
 
         term, term_operator = ast.children
         result = self._evaluate_term(term)
@@ -149,11 +149,50 @@ class Evaluator:
         # if operator found
         if term_operator.children:
             if term_operator.children[0].name == "PLUS":
-                result += self._evaluate_expression(term_operator.children[1])
+                result += self._evaluate_operand(term_operator.children[1])
             elif term_operator.children[0].name == "MINUS":
-                result -= self._evaluate_expression(term_operator.children[1])
+                result -= self._evaluate_operand(term_operator.children[1])
             else:
                 raise Exception(f"Invalid Term Operator: {term.children[0].name}")
+
+        return result
+
+    def _evaluate_expression(self, ast: ASTNode) -> int:
+        assert ast.name == "EXPRESSION"
+
+        operand, operand_operator = ast.children
+        result = self._evaluate_operand(operand)
+
+        # if operator found
+        if operand_operator.children:
+            if operand_operator.children[0].name == "LESS":
+                result = (
+                    1
+                    if result < self._evaluate_expression(operand_operator.children[1])
+                    else 0
+                )
+            elif operand_operator.children[0].name == "GREATER":
+                result = (
+                    1
+                    if result > self._evaluate_expression(operand_operator.children[1])
+                    else 0
+                )
+            elif operand_operator.children[0].name == "LESS_EQUAL":
+                result = (
+                    1
+                    if result <= self._evaluate_expression(operand_operator.children[1])
+                    else 0
+                )
+            elif operand_operator.children[0].name == "GREATER_EQUAL":
+                result = (
+                    1
+                    if result >= self._evaluate_expression(operand_operator.children[1])
+                    else 0
+                )
+            else:
+                raise Exception(
+                    f"Invalid Operand Operator: {operand_operator.children[0].name}"
+                )
 
         return result
 
@@ -209,6 +248,29 @@ class Evaluator:
             else:
                 raise Exception(f"Invalid conditional branch name: {child.name}")
 
+    def _evaluate_for_block(self, ast: ASTNode) -> None:
+        assert ast.name == "FOR_BLOCK"
+
+        var_def = ast.children[2]
+        condition = ast.children[4]
+        var_mutation = ast.children[6]
+
+        self._evaluate_var_definition(var_def)
+
+        scope_when_loop_started = self.curr_scope
+
+        while self._bool_cast_expression(condition):
+            self._evaluate_statements(ast.children[9])
+
+            if self.curr_scope != scope_when_loop_started:
+                # Return statement was executed
+                return
+            if self.curr_scope.symbols["$BREAK_FLAG"]:
+                self.curr_scope.symbols["$BREAK_FLAG"] = False
+                return
+
+            self._evaluate_var_mutation(var_mutation)
+
     def _evaluate_statement(self, ast: ASTNode) -> None:
         assert ast.name == "STATEMENT"
 
@@ -224,6 +286,8 @@ class Evaluator:
             self._evaluate_var_mutation(ast.children[0])
         elif ast.children[0].name == "IF_BLOCK":
             self._evaluate_if_block(ast.children[0])
+        elif ast.children[0].name == "FOR_BLOCK":
+            self._evaluate_for_block(ast.children[0])
         else:
             raise Exception(f"Invalid Statement: {ast.children[0].name}")
 

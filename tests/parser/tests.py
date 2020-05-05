@@ -291,6 +291,32 @@ class ConditionalTests(unittest.TestCase):
             RightCurlyToken,
         ]
         ast = parse(tokens)
+
+
+class LoopTests(unittest.TestCase):
+    def test__LL1_parse__for_loop(self):
+        tokens = [
+            ForToken,
+            LeftParenToken,
+            LetToken,
+            IdentifierToken,
+            AssignToken,
+            IntegerToken,
+            SemiColonToken,
+            IdentifierToken,
+            LessToken,
+            IntegerToken,
+            SemiColonToken,
+            IdentifierToken,
+            AssignToken,
+            IdentifierToken,
+            PlusToken,
+            IntegerToken,
+            RightParenToken,
+            LeftCurlyToken,
+            RightCurlyToken,
+        ]
+        ast = parse(tokens)
         print(ast)
 
 

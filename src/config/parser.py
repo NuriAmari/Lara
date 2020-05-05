@@ -26,6 +26,10 @@ identifier = Terminal(name="IDENTIFIER")
 let = Terminal(name="LET")
 assign = Terminal(name="ASSIGN")
 return_kw = Terminal(name="RETURN")
+less = Terminal(name="LESS")
+greater = Terminal(name="GREATER")
+greater_equal = Terminal(name="GREATER_EQUAL")
+less_equal = Terminal(name="LESS_EQUAL")
 
 
 # NON TERMINAL
@@ -65,6 +69,8 @@ ANOTHER_ARGUMENT_DEF = NonTerminal(name="ANOTHER_ARGUMENT_DEF")
 RETURN_STATEMENT = NonTerminal(name="RETURN_STATEMENT")
 RETURN_VALUE = NonTerminal(name="RETURN_VALUE")
 VAR_ASSIGN = NonTerminal(name="VAR_ASSIGN")
+OPERAND = NonTerminal(name="OPERAND")
+OPERAND_OPERATOR = NonTerminal(name="OPERAND_OPERATOR")
 
 PRODUCTION_RULES = [
     ProductionRule(START, [STATEMENTS]),
@@ -89,7 +95,7 @@ PRODUCTION_RULES = [
             semi_colon,
             EXPRESSION,
             semi_colon,
-            STATEMENT,
+            VAR_ASSIGN,
             right_paren,
             left_curly,
             STATEMENTS,
@@ -125,10 +131,15 @@ PRODUCTION_RULES = [
         ],
     ),
     # expressions
-    # ProductionRule(STATEMENT, [EXPRESSION, semi_colon]),
-    ProductionRule(EXPRESSION, [TERM, TERM_OPERATOR]),
-    ProductionRule(TERM_OPERATOR, [plus, EXPRESSION]),
-    ProductionRule(TERM_OPERATOR, [minus, EXPRESSION]),
+    ProductionRule(EXPRESSION, [OPERAND, OPERAND_OPERATOR]),
+    ProductionRule(OPERAND_OPERATOR, [greater, EXPRESSION]),
+    ProductionRule(OPERAND_OPERATOR, [less, EXPRESSION]),
+    ProductionRule(OPERAND_OPERATOR, [less_equal, EXPRESSION]),
+    ProductionRule(OPERAND_OPERATOR, [greater_equal, EXPRESSION]),
+    ProductionRule(OPERAND_OPERATOR, [Epsilon()]),
+    ProductionRule(OPERAND, [TERM, TERM_OPERATOR]),
+    ProductionRule(TERM_OPERATOR, [plus, OPERAND]),
+    ProductionRule(TERM_OPERATOR, [minus, OPERAND]),
     ProductionRule(TERM_OPERATOR, [Epsilon()]),
     ProductionRule(TERM, [FACTOR, FACTOR_OPERATOR]),
     ProductionRule(FACTOR_OPERATOR, [multiply, TERM]),

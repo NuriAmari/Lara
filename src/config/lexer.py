@@ -152,6 +152,10 @@ TOKENIZER = DFA(
         COMMA,
         PRINT,
         RETURN,
+        LESS,
+        LESS_EQUAL,
+        GREATER,
+        GREATER_EQUAL,
         close=False,
     )
 )
