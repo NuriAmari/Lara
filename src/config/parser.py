@@ -30,6 +30,7 @@ less = Terminal(name="LESS")
 greater = Terminal(name="GREATER")
 greater_equal = Terminal(name="GREATER_EQUAL")
 less_equal = Terminal(name="LESS_EQUAL")
+break_kw = Terminal(name="BREAK")
 
 
 # NON TERMINAL
@@ -71,6 +72,9 @@ RETURN_VALUE = NonTerminal(name="RETURN_VALUE")
 VAR_ASSIGN = NonTerminal(name="VAR_ASSIGN")
 OPERAND = NonTerminal(name="OPERAND")
 OPERAND_OPERATOR = NonTerminal(name="OPERAND_OPERATOR")
+ROOT_VAR_REF = NonTerminal(name="ROOT_VAR_REF")
+ROOT_VAR_REF_OPERATOR = NonTerminal(name="ROOT_VAR_REF_OPERATOR")
+BREAK_STATEMENT = NonTerminal(name="BREAK_STATEMENT")
 
 PRODUCTION_RULES = [
     ProductionRule(START, [STATEMENTS]),
@@ -78,7 +82,10 @@ PRODUCTION_RULES = [
     ProductionRule(STATEMENTS, [Epsilon()]),
     ProductionRule(ANOTHER_STATEMENT, [STATEMENTS]),
     ProductionRule(STATEMENT, [VAR_DEF, semi_colon]),
-    ProductionRule(STATEMENT, [VAR_ASSIGN, semi_colon]),
+    ProductionRule(STATEMENT, [ROOT_VAR_REF, semi_colon]),
+    ProductionRule(ROOT_VAR_REF, [identifier, ROOT_VAR_REF_OPERATOR]),
+    ProductionRule(ROOT_VAR_REF_OPERATOR, [left_paren, ARGUMENTS, right_paren]),
+    ProductionRule(ROOT_VAR_REF_OPERATOR, [assign, EXPRESSION]),
     ProductionRule(STATEMENT, [IF_BLOCK]),
     ProductionRule(IF_BLOCK, [IF, IF_BLOCK_CONTINUE]),
     ProductionRule(IF_BLOCK_CONTINUE, [Epsilon()]),
@@ -199,4 +206,7 @@ PRODUCTION_RULES = [
     ProductionRule(RETURN_STATEMENT, [return_kw, RETURN_VALUE]),
     ProductionRule(RETURN_VALUE, [EXPRESSION]),
     ProductionRule(RETURN_VALUE, [Epsilon()]),
+    # break
+    ProductionRule(STATEMENT, [BREAK_STATEMENT, semi_colon]),
+    ProductionRule(BREAK_STATEMENT, [break_kw]),
 ]

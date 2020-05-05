@@ -36,6 +36,7 @@ from src.config.tokens import (
     SemiColonToken,
     WhileToken,
     ReturnToken,
+    BreakToken,
 )
 
 # LITERALS
@@ -102,6 +103,9 @@ FOR.add_token(ForToken)
 RETURN = Concat(Atom("r"), Atom("e"), Atom("t"), Atom("u"), Atom("r"), Atom("n"))
 RETURN.add_token(ReturnToken)
 
+BREAK = Concat(Atom("b"), Atom("r"), Atom("e"), Atom("a"), Atom("k"))
+BREAK.add_token(BreakToken)
+
 # PUNCTUATION
 
 SEMI_COLON = Atom(";")
@@ -156,6 +160,7 @@ TOKENIZER = DFA(
         LESS_EQUAL,
         GREATER,
         GREATER_EQUAL,
+        BREAK,
         close=False,
     )
 )

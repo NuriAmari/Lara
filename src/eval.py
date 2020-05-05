@@ -213,6 +213,11 @@ class Evaluator:
         self.curr_scope.symbols["$RETURN"] = retval
         self.curr_scope.symbols["$RETURN_FLAG"] = True
 
+    def _evaluate_break(self, ast: ASTNode) -> None:
+        assert ast.name == "BREAK_STATEMENT"
+
+        self.curr_scope.symbols["$BREAK_FLAG"] = True
+
     def _evaluate_var_mutation(self, ast: ASTNode) -> None:
         assert ast.name == "VAR_ASSIGN"
 
@@ -271,6 +276,27 @@ class Evaluator:
 
             self._evaluate_var_mutation(var_mutation)
 
+    # A less than ideal hack to maintain an LL1 parseable grammar
+    def _evaluate_root_var_ref(self, ast: ASTNode) -> None:
+        assert ast.name == "ROOT_VAR_REF"
+
+        identifier_lexme = ast.children[0].lexme
+
+        if identifier_lexme is None:
+            raise Exception("Identifier lexme is missing")
+
+        root_var_ref_operator = ast.children[1]
+
+        if root_var_ref_operator.children[0].name == "LEFT_PAREN":
+            self.curr_scope.get_symbol(identifier_lexme)(
+                self, self._evaluate_arguments(root_var_ref_operator.children[1])
+            )
+        elif root_var_ref_operator.children[0].name == "ASSIGN":
+            self.curr_scope.set_symbol(
+                identifier_lexme,
+                self._evaluate_expression(root_var_ref_operator.children[1]),
+            )
+
     def _evaluate_statement(self, ast: ASTNode) -> None:
         assert ast.name == "STATEMENT"
 
@@ -288,6 +314,10 @@ class Evaluator:
             self._evaluate_if_block(ast.children[0])
         elif ast.children[0].name == "FOR_BLOCK":
             self._evaluate_for_block(ast.children[0])
+        elif ast.children[0].name == "ROOT_VAR_REF":
+            self._evaluate_root_var_ref(ast.children[0])
+        elif ast.children[0].name == "BREAK_STATEMENT":
+            self._evaluate_break(ast.children[0])
         else:
             raise Exception(f"Invalid Statement: {ast.children[0].name}")
 
@@ -301,6 +331,9 @@ class Evaluator:
                     self.curr_scope = self.curr_scope.parent
                 else:
                     raise Exception("Use of return outside of function")
+                break
+
+            if self.curr_scope.symbols["$BREAK_FLAG"]:
                 break
 
     def _evaluate_function_definition(self, ast: ASTNode) -> None:

@@ -1,13 +1,15 @@
 
-func test(a) {
+func test() {
 
     for (let i = 0; i < 10; i = i + 1) {
         print(i);
-        if (i > 5) {
-            return 5;
+        if (i > 3) {
+            break;
         }
     }
 
+    print(1119);
+
 }
 
-print(test(1));
+test();
