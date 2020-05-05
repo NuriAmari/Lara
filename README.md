@@ -76,6 +76,32 @@ if (a) {
 }
 ```
 
+#### For Loops
+
+```javascript
+for (let i = 0; i < 10; i = i + 1) {
+    print(i)
+}
+```
+
+#### Break
+
+```javascript
+func print0_9() {
+    for (let i = 0; i < 10; i = i + 1) {
+        if (i > 5) {
+            break;
+        }
+        print(i);
+    }
+    for (let j = i; j < 10; j = j + 1) {
+        print(j);
+    }
+}
+
+print0_9();
+```
+
 #### Return 
 
 ```javascript
@@ -96,7 +122,7 @@ print(1 + 1);
 ```
 ### Todo
 
-- Loops
+- While Loops
 - Arrays
 - More types
 - First class functions
