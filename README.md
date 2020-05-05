@@ -76,6 +76,17 @@ if (a) {
 }
 ```
 
+
+#### While Loops
+
+```javascript
+let i = 0;
+while (i < 10) {
+    print(i)
+    i = i + 1;
+}
+```
+
 #### For Loops
 
 ```javascript
@@ -122,7 +133,6 @@ print(1 + 1);
 ```
 ### Todo
 
-- While Loops
 - Arrays
 - More types
 - First class functions
