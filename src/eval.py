@@ -46,7 +46,7 @@ class Function:
         new_scope = ScopeTreeNode(evaluator.curr_scope)
         self.arg_parse_func(args, new_scope)
         evaluator.curr_scope = new_scope
-        evaluator._evaluate_statements(self.ast.children[6])
+        evaluator._evaluate_statements(self.ast.children[6], True)
 
         return new_scope.symbols["$RETURN"]
 
@@ -267,8 +267,7 @@ class Evaluator:
         while self._bool_cast_expression(condition):
             self._evaluate_statements(ast.children[9])
 
-            if self.curr_scope != scope_when_loop_started:
-                # Return statement was executed
+            if self.curr_scope.symbols["$RETURN_FLAG"]:
                 return
             if self.curr_scope.symbols["$BREAK_FLAG"]:
                 self.curr_scope.symbols["$BREAK_FLAG"] = False
@@ -285,8 +284,7 @@ class Evaluator:
         while self._bool_cast_expression(condition):
             self._evaluate_statements(ast.children[5])
 
-            if self.curr_scope != scope_when_loop_started:
-                # Return statement was executed
+            if self.curr_scope.symbols["$RETURN_FLAG"]:
                 return
             if self.curr_scope.symbols["$BREAK_FLAG"]:
                 self.curr_scope.symbols["$BREAK_FLAG"] = False
@@ -339,16 +337,19 @@ class Evaluator:
         else:
             raise Exception(f"Invalid Statement: {ast.children[0].name}")
 
-    def _evaluate_statements(self, ast: ASTNode) -> None:
+    def _evaluate_statements(
+        self, ast: ASTNode, direct_child_of_func_call=False
+    ) -> None:
         assert ast.name == "STATEMENTS"
 
         for statement in ast.children:
             self._evaluate_statement(statement)
             if self.curr_scope.symbols["$RETURN_FLAG"]:
-                if self.curr_scope.parent is not None:
-                    self.curr_scope = self.curr_scope.parent
-                else:
-                    raise Exception("Use of return outside of function")
+                if direct_child_of_func_call:
+                    if self.curr_scope.parent is not None:
+                        self.curr_scope = self.curr_scope.parent
+                    else:
+                        raise Exception("Use of return outside of function")
                 break
 
             if self.curr_scope.symbols["$BREAK_FLAG"]:
