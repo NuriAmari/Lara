@@ -66,9 +66,79 @@ class ExpressionTests(unittest.TestCase):
         ]
         ast = parse(tokens)
 
-        expected_ast = add_ast_boilerplate({"START": [],})
+        expected_ast = add_ast_boilerplate(
+            {
+                "START": [
+                    {
+                        "STATEMENTS": [
+                            {
+                                "STATEMENT": [
+                                    {
+                                        "VAR_DEF": [
+                                            {"LET": []},
+                                            {"IDENTIFIER": []},
+                                            {"ASSIGN": []},
+                                            {
+                                                "EXPRESSION": [
+                                                    {
+                                                        "OPERAND": [
+                                                            {
+                                                                "TERM": [
+                                                                    {
+                                                                        "FACTOR": [
+                                                                            {
+                                                                                "INTEGER": []
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "FACTOR_OPERATOR": []
+                                                                    },
+                                                                ]
+                                                            },
+                                                            {
+                                                                "TERM_OPERATOR": [
+                                                                    {"PLUS": []},
+                                                                    {
+                                                                        "OPERAND": [
+                                                                            {
+                                                                                "TERM": [
+                                                                                    {
+                                                                                        "FACTOR": [
+                                                                                            {
+                                                                                                "INTEGER": []
+                                                                                            },
+                                                                                        ]
+                                                                                    },
+                                                                                    {
+                                                                                        "FACTOR_OPERATOR": []
+                                                                                    },
+                                                                                ]
+                                                                            },
+                                                                            {
+                                                                                "TERM_OPERATOR": []
+                                                                            },
+                                                                        ]
+                                                                    },
+                                                                ]
+                                                            },
+                                                        ]
+                                                    },
+                                                    {"OPERAND_OPERATOR": []},
+                                                ]
+                                            },
+                                        ]
+                                    },
+                                    {"SEMI_COLON": []},
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
 
-        # self.assertTrue(compare_ast(ast, expected_ast))
+        self.assertTrue(compare_ast(ast, expected_ast))
 
 
 class FunctionDefinitionTests(unittest.TestCase):
@@ -95,7 +165,7 @@ class FunctionDefinitionTests(unittest.TestCase):
                                             {"FUNC": []},
                                             {"IDENTIFIER": []},
                                             {"LEFT_PAREN": []},
-                                            {"ARGUMENTS": []},
+                                            {"ARGUMENTS_DEF": []},
                                             {"RIGHT_PAREN": []},
                                             {"LEFT_CURLY": []},
                                             {"STATEMENTS": []},
@@ -110,7 +180,7 @@ class FunctionDefinitionTests(unittest.TestCase):
             }
         )
 
-        # self.assertTrue(compare_ast(ast, expected_ast))
+        self.assertTrue(compare_ast(ast, expected_ast))
 
     def test__LL1_parse_arguments(self):
         tokens = [
@@ -143,102 +213,21 @@ class FunctionDefinitionTests(unittest.TestCase):
                                             {
                                                 "ARGUMENTS_DEF": [
                                                     {
-                                                        "ARGUMENT": [
-                                                            {
-                                                                "EXPRESSION": [
-                                                                    {
-                                                                        "TERM": [
-                                                                            {
-                                                                                "FACTOR": [
-                                                                                    {
-                                                                                        "VAR_REF": [
-                                                                                            {
-                                                                                                "IDENTIFIER": [],
-                                                                                            },
-                                                                                            {
-                                                                                                "CALL": []
-                                                                                            },
-                                                                                        ]
-                                                                                    },
-                                                                                ]
-                                                                            },
-                                                                            {
-                                                                                "FACTOR_OPERATOR": []
-                                                                            },
-                                                                        ]
-                                                                    },
-                                                                    {
-                                                                        "TERM_OPERATOR": []
-                                                                    },
-                                                                ]
-                                                            }
-                                                        ]
+                                                        "ARGUMENT_DEF": [
+                                                            {"IDENTIFIER": []}
+                                                        ],
                                                     },
-                                                    {"COMMA": [],},
+                                                    {"COMMA": []},
                                                     {
-                                                        "ARGUMENT": [
-                                                            {
-                                                                "EXPRESSION": [
-                                                                    {
-                                                                        "TERM": [
-                                                                            {
-                                                                                "FACTOR": [
-                                                                                    {
-                                                                                        "VAR_REF": [
-                                                                                            {
-                                                                                                "IDENTIFIER": [],
-                                                                                            },
-                                                                                            {
-                                                                                                "CALL": []
-                                                                                            },
-                                                                                        ]
-                                                                                    },
-                                                                                ]
-                                                                            },
-                                                                            {
-                                                                                "FACTOR_OPERATOR": []
-                                                                            },
-                                                                        ]
-                                                                    },
-                                                                    {
-                                                                        "TERM_OPERATOR": []
-                                                                    },
-                                                                ]
-                                                            }
-                                                        ]
+                                                        "ARGUMENT_DEF": [
+                                                            {"IDENTIFIER": []}
+                                                        ],
                                                     },
-                                                    {"COMMA": [],},
+                                                    {"COMMA": []},
                                                     {
-                                                        "ARGUMENT": [
-                                                            {
-                                                                "EXPRESSION": [
-                                                                    {
-                                                                        "TERM": [
-                                                                            {
-                                                                                "FACTOR": [
-                                                                                    {
-                                                                                        "VAR_REF": [
-                                                                                            {
-                                                                                                "IDENTIFIER": [],
-                                                                                            },
-                                                                                            {
-                                                                                                "CALL": []
-                                                                                            },
-                                                                                        ]
-                                                                                    },
-                                                                                ]
-                                                                            },
-                                                                            {
-                                                                                "FACTOR_OPERATOR": []
-                                                                            },
-                                                                        ]
-                                                                    },
-                                                                    {
-                                                                        "TERM_OPERATOR": []
-                                                                    },
-                                                                ]
-                                                            }
-                                                        ]
+                                                        "ARGUMENT_DEF": [
+                                                            {"IDENTIFIER": []}
+                                                        ],
                                                     },
                                                 ]
                                             },
@@ -256,7 +245,7 @@ class FunctionDefinitionTests(unittest.TestCase):
             }
         )
 
-        # self.assertTrue(compare_ast(ast, expected_ast))
+        self.assertTrue(compare_ast(ast, expected_ast))
 
 
 class ConditionalTests(unittest.TestCase):
@@ -317,7 +306,6 @@ class LoopTests(unittest.TestCase):
             RightCurlyToken,
         ]
         ast = parse(tokens)
-        print(ast)
 
 
 class IOTests(unittest.TestCase):
